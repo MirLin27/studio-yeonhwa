@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Yeonhwa – 3D 아바타 제작</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=DM+Serif+Display:ital@0;1&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf8f5;
+    --ink: #1c1a18;
+    --ink-muted: #6b6560;
+    --rose: #c9748a;
+    --rose-light: #f0d8de;
+    --rose-pale: #fdf4f6;
+    --gold: #b8936a;
+    --gold-light: #f0e4d4;
+    --line: #e4ddd6;
+    --white: #ffffff;
+    --section-radius: 2px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    line-height: 1.85;
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(160deg, #1c1a18 0%, #2e2320 55%, #3d2a2a 100%);
+    color: var(--white);
+    padding: 64px 40px 52px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 60% at 80% 20%, rgba(201,116,138,.18) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 50% at 10% 90%, rgba(184,147,106,.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 11px;
+    letter-spacing: .24em;
+    color: var(--rose);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    position: relative;
+  }
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(30px, 6vw, 52px);
+    line-height: 1.15;
+    letter-spacing: -.01em;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: #e8b4c0;
+  }
+  .hero-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,.55);
+    letter-spacing: .06em;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .hero-divider {
+    width: 40px;
+    height: 1px;
+    background: var(--rose);
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .hero-intro {
+    font-size: 14px;
+    line-height: 2;
+    color: rgba(255,255,255,.78);
+    max-width: 520px;
+    position: relative;
+  }
+  .hero-intro strong {
+    color: #e8c5ce;
+    font-weight: 500;
+  }
+
+  /* ── WRAPPER ── */
+  .content {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* ── STATIC NOTICE (기본 안내 전) ── */
+  .static-block {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--section-radius);
+    padding: 28px 28px 24px;
+    margin: 28px 0 0;
+  }
+  .static-block p {
+    font-size: 13.5px;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .static-block p:last-child { margin-bottom: 0; }
+  .static-block strong { font-weight: 500; color: var(--rose); }
+  .static-block .note {
+    font-size: 12.5px;
+    color: var(--ink-muted);
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    margin-top: 14px;
+  }
+
+  /* ── ACCORDION ── */
+  .sections { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+
+  .acc {
+    border: 1px solid var(--line);
+    border-radius: var(--section-radius);
+    background: var(--white);
+    overflow: hidden;
+    transition: box-shadow .25s;
+  }
+  .acc:hover { box-shadow: 0 2px 20px rgba(201,116,138,.08); }
+
+  .acc-trigger {
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 22px;
+    text-align: left;
+    transition: background .2s;
+  }
+  .acc-trigger:hover { background: var(--rose-pale); }
+  .acc[data-open] .acc-trigger { background: var(--rose-pale); }
+
+  .acc-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--rose-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    transition: background .2s;
+  }
+  .acc[data-open] .acc-icon { background: var(--rose); }
+
+  .acc-label {
+    flex: 1;
+  }
+  .acc-label-ko {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--ink);
+    display: block;
+    line-height: 1.4;
+  }
+  .acc-label-en {
+    font-size: 10.5px;
+    letter-spacing: .14em;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+  }
+
+  .acc-arrow {
+    width: 18px;
+    height: 18px;
+    color: var(--rose);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    flex-shrink: 0;
+  }
+  .acc[data-open] .acc-arrow { transform: rotate(180deg); }
+
+  .acc-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .35s cubic-bezier(.4,0,.2,1);
+  }
+  .acc[data-open] .acc-body { grid-template-rows: 1fr; }
+  .acc-inner {
+    overflow: hidden;
+    padding: 0 22px;
+    font-size: 13.5px;
+    color: var(--ink);
+    line-height: 1.9;
+  }
+  .acc[data-open] .acc-inner { padding: 4px 22px 22px; }
+
+  /* ── INNER CONTENT STYLES ── */
+  .section-lead {
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* Price table */
+  .price-group { margin-bottom: 22px; }
+  .price-group:last-child { margin-bottom: 0; }
+  .price-group-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 12px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--rose-light);
+  }
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 13px;
+  }
+  .price-row:last-child { border-bottom: none; }
+  .price-name { color: var(--ink); flex: 1; }
+  .price-name small { display: block; font-size: 11.5px; color: var(--ink-muted); margin-top: 1px; }
+  .price-val {
+    font-family: 'DM Serif Display', serif;
+    font-size: 15px;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .price-val.strike {
+    text-decoration: line-through;
+    color: var(--ink-muted);
+    font-size: 12px;
+    margin-right: 4px;
+  }
+  .price-val.event { color: var(--rose); }
+
+  .package-card {
+    background: linear-gradient(135deg, #1c1a18, #2e2320);
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 18px;
+    color: var(--white);
+  }
+  .package-card .badge {
+    display: inline-block;
+    background: var(--rose);
+    color: #fff;
+    font-size: 10px;
+    letter-spacing: .14em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  .package-card .pkg-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+  .package-card .pkg-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .package-card .pkg-orig {
+    font-size: 13px;
+    color: rgba(255,255,255,.4);
+    text-decoration: line-through;
+  }
+  .package-card .pkg-event {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: #e8b4c0;
+  }
+  .package-card .pkg-list {
+    list-style: none;
+    font-size: 12.5px;
+    color: rgba(255,255,255,.75);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+  }
+  .package-card .pkg-list li::before { content: '✦ '; color: var(--rose); font-size: 9px; }
+
+  /* Steps */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex;
+    gap: 16px;
+    position: relative;
+    padding-bottom: 18px;
+  }
+  .step:last-child { padding-bottom: 0; }
+  .step-left { display: flex; flex-direction: column; align-items: center; }
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--rose-light);
+    color: var(--rose);
+    font-family: 'DM Serif Display', serif;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-line {
+    width: 1px;
+    flex: 1;
+    background: var(--rose-light);
+    margin-top: 4px;
+  }
+  .step:last-child .step-line { display: none; }
+  .step-content { padding-top: 4px; }
+  .step-title { font-weight: 500; font-size: 13.5px; margin-bottom: 3px; }
+  .step-desc { font-size: 12.5px; color: var(--ink-muted); }
+
+  /* Tag list for info blocks */
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .tag {
+    background: var(--gold-light);
+    color: var(--gold);
+    font-size: 11.5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .tag.rose { background: var(--rose-light); color: var(--rose); }
+
+  /* Notice boxes */
+  .notice {
+    background: var(--rose-pale);
+    border-left: 3px solid var(--rose);
+    border-radius: 0 2px 2px 0;
+    padding: 12px 14px;
+    font-size: 12.5px;
+    color: var(--ink-muted);
+    margin-top: 14px;
+    line-height: 1.75;
+  }
+  .notice strong { color: var(--rose); font-weight: 500; }
+
+  .notice.gold {
+    background: var(--gold-light);
+    border-color: var(--gold);
+  }
+  .notice.gold strong { color: var(--gold); }
+
+  /* Refund table */
+  .refund-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 13px;
+  }
+  .refund-row:last-child { border-bottom: none; }
+  .refund-stage {
+    flex: 1;
+    color: var(--ink-muted);
+    font-size: 12.5px;
+  }
+  .refund-pct {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--rose);
+    white-space: nowrap;
+    min-width: 60px;
+    text-align: right;
+  }
+
+  /* Revision info */
+  .revision-item {
+    padding: 9px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 13px;
+  }
+  .revision-item:last-child { border-bottom: none; }
+
+  /* ── SAMPLE GALLERY ── */
+  .sample-section {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--section-radius);
+    margin: 8px 0 0;
+    overflow: hidden;
+  }
+  .sample-header {
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .sample-header-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .sample-header-top .acc-icon { background: #fde8d0; }
+  .sample-label-ko {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--ink);
+    display: block;
+    line-height: 1.4;
+  }
+  .sample-label-en {
+    font-size: 10.5px;
+    letter-spacing: .14em;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+  }
+  .sample-caption {
+    font-size: 12.5px;
+    color: var(--ink-muted);
+    line-height: 1.8;
+  }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    padding: 2px;
+  }
+  .gallery-slot {
+    aspect-ratio: 3/4;
+    background: var(--rose-pale);
+    border: 1.5px dashed var(--rose-light);
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .gallery-slot:hover { background: #faeaee; border-color: var(--rose); }
+  .gallery-slot img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .gallery-slot input[type=file] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+  .gallery-slot-icon {
+    font-size: 22px;
+    opacity: .5;
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .gallery-slot-label {
+    font-size: 11px;
+    color: var(--ink-muted);
+    letter-spacing: .06em;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .gallery-slot.has-img .gallery-slot-icon,
+  .gallery-slot.has-img .gallery-slot-label { display: none; }
+  .gallery-remove {
+    display: none;
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.55);
+    color: #fff;
+    border: none;
+    font-size: 12px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  .gallery-slot.has-img .gallery-remove { display: flex; }
+  .gallery-hint {
+    padding: 10px 22px 18px;
+    font-size: 11.5px;
+    color: var(--ink-muted);
+    text-align: center;
+  }
+
+  /* ── FOOTER STAMP ── */
+  .footer-stamp {
+    max-width: 720px;
+    margin: 32px auto 0;
+    padding: 0 20px;
+    text-align: center;
+  }
+  .footer-stamp p {
+    font-size: 11.5px;
+    color: var(--ink-muted);
+    letter-spacing: .06em;
+    line-height: 1.9;
+  }
+  .footer-stamp .studio-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 15px;
+    color: var(--rose);
+    display: block;
+    margin-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Studio Yeonhwa · 스튜디오 연화</div>
+  <h1 class="hero-title">3D 아바타 <em>제작</em><br>커미션</h1>
+  <p class="hero-sub">VSeeFace · Warudo · Blender · VRM</p>
+  <div class="hero-divider"></div>
+  <p class="hero-intro">
+    방송의 첫인상은 화면에 비치는 아바타에서 시작됩니다.<br>
+    스튜디오 연화는 단순 조립이 아닌,<br>
+    <strong>방송에서 오래 사용할 나만의 이미지</strong>를 만드는 것을 목표로 합니다.<br><br>
+    눈매, 입술, 표정, 얼굴선, 분위기까지 하나하나 확인하며,<br>
+    원하시는 이미지에 최대한 맞추기 위해 충분히 소통합니다.
+  </p>
+</div>
+
+<div class="content">
+
+  <!-- 기본 안내 (정적 블록) -->
+  <div class="static-block">
+    <p>본 작업은 <strong>Booth 등에서 구매 가능한 아바타 · 헤어 · 의상 · 소품 에셋</strong>을 조합하고, 블렌더 성형 · 페이셜 · 물리 작업 · 방송용 세팅 등을 더해 완성하는 커미션입니다.</p>
+    <p>작업에 사용되는 모든 에셋은 작업자와 신청자 양측이 모두 구매한 상태에서 진행합니다. 제가 보유하지 않은 파츠나 에셋은 신청자분께서 구매 후 Booth 기프트 등으로 전달해주시면 됩니다.</p>
+    <div class="note">
+      상업적 사용 · 수정 · 가공 · 방송 사용이 가능한 에셋으로만 작업이 가능합니다. 의뢰 전 반드시 에셋의 이용약관 및 상업적 이용 가능 여부를 확인해주세요. 이용약관 미확인으로 발생하는 저작권 문제에 대해서는 스튜디오 연화가 책임지지 않습니다.
+    </div>
+  </div>
+
+  <!-- 작업 샘플 안내 (정적 + 갤러리) -->
+  <div class="sample-section">
+    <div class="sample-header">
+      <div class="sample-header-top">
+        <div class="acc-icon" style="background:#fde8d0;font-size:15px">🧡</div>
+        <div>
+          <span class="sample-label-ko">작업 샘플 안내</span>
+          <span class="sample-label-en">Portfolio &amp; Samples</span>
+        </div>
+      </div>
+      <p class="sample-caption">
+        포트폴리오 및 샘플 이미지는 VSeeFace 또는 Warudo 환경에서 확인한 결과물입니다.<br>
+        사용하시는 프로그램 · 조명 · 카메라 설정 · 보정 여부 · 트래킹 환경에 따라 실제 화면에서 보이는 느낌이 조금 달라질 수 있습니다.<br>
+        기본적인 아바타 사용법이나 세팅 방법은 필요하신 경우 안내드릴 수 있습니다.
+      </p>
+    </div>
+    <div class="gallery" id="gallery">
+      <!-- 슬롯 8개 -->
+    </div>
+    <div class="gallery-hint">이미지를 클릭하면 샘플을 업로드할 수 있습니다 · 각 슬롯에 1장씩 (권장 비율 3:4)</div>
+  </div>
+
+  <!-- ACCORDION SECTIONS -->
+  <div class="sections">
+
+    <!-- 1. 금액 안내 -->
+    <div class="acc">
+      <button class="acc-trigger" onclick="toggle(this)">
+        <div class="acc-icon">💛</div>
+        <div class="acc-label">
+          <span class="acc-label-ko">금액 안내</span>
+          <span class="acc-label-en">Pricing</span>
+        </div>
+        <svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="acc-body">
+        <div class="acc-inner">
+          <!-- 데뷔 패키지 -->
+          <div class="price-group">
+            <div class="price-group-title">오픈 이벤트 패키지</div>
+            <div class="package-card">
+              <span class="badge">Open Event</span>
+              <div class="pkg-name">데뷔 패키지</div>
+              <div class="pkg-price-row">
+                <span class="pkg-orig">정가 300,000원</span>
+                <span class="pkg-event">150,000원</span>
+              </div>
+              <ul class="pkg-list">
+                <li>블렌더 성형</li>
+                <li>52가지 페이셜</li>
+                <li>전용 의상 1종</li>
+                <li>전용 헤어 1종</li>
+                <li>실시간 그림자 세팅</li>
+                <li>뚫림 방지 물리 작업</li>
+                <li>VSF / Warudo 기본 세팅</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- VSF -->
+          <div class="price-group">
+            <div class="price-group-title">VSF / VSeeFace</div>
+            <div class="price-row"><span class="price-name">기본 세팅</span><span class="price-val">30,000원</span></div>
+            <div class="price-row"><span class="price-name">옷장 기능 <small>개당</small></span><span class="price-val">2,000원</span></div>
+            <div class="price-row"><span class="price-name">실시간 그림자 세팅</span><span class="price-val">30,000원</span></div>
+            <div class="price-row"><span class="price-name">눈 깜빡임 연동 특수 효과</span><span class="price-val">30,000원</span></div>
+          </div>
+
+          <!-- Warudo -->
+          <div class="price-group">
+            <div class="price-group-title">Warudo (닐로툰 제외)</div>
+            <div class="price-row"><span class="price-name">기본 세팅</span><span class="price-val">30,000원</span></div>
+            <div class="price-row"><span class="price-name">옷장 기능 <small>개당</small></span><span class="price-val">2,000원</span></div>
+            <div class="price-row"><span class="price-name">실시간 그림자 세팅</span><span class="price-val">30,000원</span></div>
+            <div class="price-row"><span class="price-name">눈 깜빡임 연동 특수 효과</span><span class="price-val">30,000원</span></div>
+            <div class="price-row"><span class="price-name">API 세팅 <small>예: 후원 치즈 폭탄, 채팅 ? 롤 핑 등</small></span><span class="price-val" style="color:var(--gold)">기본 제공</span></div>
+          </div>
+
+          <!-- 페이셜 -->
+          <div class="price-group">
+            <div class="price-group-title">페이셜</div>
+            <div class="price-row"><span class="price-name">52가지 표정 키 페이셜 작업</span><span class="price-val">150,000원</span></div>
+            <div class="price-row"><span class="price-name">눈 연동 표정 효과 <small>하트눈, 별눈 등 · 개당</small></span><span class="price-val">10,000원</span></div>
+            <div class="price-row"><span class="price-name">얼굴 연동 표정 효과 <small>홍조, 눈물, 음영 등 · 개당</small></span><span class="price-val">20,000원</span></div>
+            <div class="notice">연동 표정 효과는 <strong>페이셜 작업과 함께 진행</strong>하는 것을 권장합니다. 작업 완료 후 별도 추가 요청 시 의뢰 건당 <strong>+20,000원</strong>의 추가금이 발생합니다.</div>
+          </div>
+
+          <!-- 뚜따 / 파츠 -->
+          <div class="price-group">
+            <div class="price-group-title">뚜따 / 파츠 적용</div>
+            <div class="price-row"><span class="price-name">전용 의상 적용 <small>개당</small></span><span class="price-val">5,000원</span></div>
+            <div class="price-row"><span class="price-name">전용 헤어 적용 <small>개당</small></span><span class="price-val">5,000원</span></div>
+            <div class="price-row"><span class="price-name">비전용 헤어 적용 <small>개당</small></span><span class="price-val">10,000원</span></div>
+            <div class="price-row"><span class="price-name">악세사리 적용 <small>개당</small></span><span class="price-val">2,000원</span></div>
+            <div class="price-row"><span class="price-name">바디 교체 <small>A 헤드 + B 바디 합체</small></span><span class="price-val">20,000원</span></div>
+            <div class="price-row"><span class="price-name">헤어 합성 <small>A 뒷머리 + B 앞머리 조합 등</small></span><span class="price-val">15,000원~</span></div>
+            <div class="price-row"><span class="price-name">옷장 기능 <small>개당</small></span><span class="price-val">2,000원</span></div>
+          </div>
+
+          <!-- 텍스쳐 -->
+          <div class="price-group">
+            <div class="price-group-title">텍스쳐</div>
+            <div class="price-row"><span class="price-name">에셋 기본 색상 외 자유 색상 변경</span><span class="price-val">5,000원</span></div>
+            <div class="price-row"><span class="price-name">비전용 눈동자 텍스쳐 대응</span><span class="price-val">5,000원</span></div>
+            <div class="price-row"><span class="price-name">헤어 투톤 · 브릿지 등 포인트 컬러</span><span class="price-val">10,000원</span></div>
+          </div>
+
+          <!-- 파일 / 기타 -->
+          <div class="price-group">
+            <div class="price-group-title">파일 제공</div>
+            <div class="price-row"><span class="price-name">수정용 VRM 파일</span><span class="price-val" style="color:var(--gold)">무료 제공</span></div>
+            <div class="price-row"><span class="price-name">유니티패키지 파일</span><span class="price-val">20,000원</span></div>
+          </div>
+
+          <!-- 빠른 마감 -->
+          <div class="price-group">
+            <div class="price-group-title">빠른 마감 추가금 (5일 이내)</div>
+            <div class="price-row"><span class="price-name">페이셜</span><span class="price-val">+50,000원</span></div>
+            <div class="price-row"><span class="price-name">뚜따</span><span class="price-val">+30,000원</span></div>
+            <div class="price-row"><span class="price-name">데뷔 패키지</span><span class="price-val">+100,000원</span></div>
+          </div>
+
+          <!-- 샘플 비공개 -->
+          <div class="price-group">
+            <div class="price-group-title">샘플 비공개</div>
+            <div class="price-row"><span class="price-name">포트폴리오 비공개</span><span class="price-val">30,000원</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 진행 순서 -->
+    <div class="acc">
+      <button class="acc-trigger" onclick="toggle(this)">
+        <div class="acc-icon">💚</div>
+        <div class="acc-label">
+          <span class="acc-label-ko">진행 순서</span>
+          <span class="acc-label-en">Process</span>
+        </div>
+        <svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="acc-body">
+        <div class="acc-inner">
+          <div class="steps">
+            <div class="step">
+              <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+              <div class="step-content">
+                <div class="step-title">문의 및 상담</div>
+                <div class="step-desc">원하시는 분위기, 사용 목적, 방송 플랫폼, 참고 이미지, 필요한 기능 등을 확인합니다.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+              <div class="step-content">
+                <div class="step-title">견적 안내 및 결제</div>
+                <div class="step-desc">작업 범위와 추가금 여부를 정리한 뒤 최종 금액을 안내드립니다.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+              <div class="step-content">
+                <div class="step-title">블렌더 성형 작업</div>
+                <div class="step-desc">아바타의 얼굴형, 눈매, 입술, 전체적인 인상을 작업합니다.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
+              <div class="step-content">
+                <div class="step-title">성형 컨펌</div>
+                <div class="step-desc">완성 방향이 맞는지 확인합니다.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-left"><div class="step-num">5</div><div class="step-line"></div></div>
+              <div class="step-content">
+                <div class="step-title">페이셜 및 기능 작업</div>
+                <div class="step-desc">표정, 연동 효과, 옷장, 그림자, 물리 작업 등을 진행합니다.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-left"><div class="step-num">6</div><div class="step-line"></div></div>
+              <div class="step-content">
+                <div class="step-title">최종 확인</div>
+                <div class="step-desc">VSeeFace 또는 Warudo 환경에서 확인 가능한 결과물을 안내드립니다.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-left"><div class="step-num">7</div></div>
+              <div class="step-content">
+                <div class="step-title">완성본 전달</div>
+                <div class="step-desc">최종 파일을 전달드립니다.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 수정 안내 -->
+    <div class="acc">
+      <button class="acc-trigger" onclick="toggle(this)">
+        <div class="acc-icon">🩵</div>
+        <div class="acc-label">
+          <span class="acc-label-ko">수정 안내</span>
+          <span class="acc-label-en">Revision Policy</span>
+        </div>
+        <svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="acc-body">
+        <div class="acc-inner">
+          <div class="revision-item">수정은 <strong>만족하실 때까지</strong> 진행합니다.</div>
+          <div class="revision-item">각 단계에서 컨펌이 완료된 이후, 단순 변심으로 인한 이전 단계 수정은 어렵습니다.</div>
+          <div class="revision-item">수정 요청은 원하는 내용을 <strong>한 번에 정리해서</strong> 전달해주세요. 나누어 여러 번 전달하실 경우 각 요청이 수정 횟수로 카운트될 수 있습니다.</div>
+          <div class="notice">컨펌이 하루 이상 지연될 경우, 지연된 기간만큼 전체 마감 일정도 함께 연장됩니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. 작업 기간 및 파일 보관 -->
+    <div class="acc">
+      <button class="acc-trigger" onclick="toggle(this)">
+        <div class="acc-icon">💜</div>
+        <div class="acc-label">
+          <span class="acc-label-ko">작업 기간 및 파일 보관</span>
+          <span class="acc-label-en">Timeline & File Storage</span>
+        </div>
+        <svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="acc-body">
+        <div class="acc-inner">
+          <div class="tag-list" style="margin-bottom:14px">
+            <span class="tag">기본 최대 2주</span>
+            <span class="tag">데뷔 패키지 최대 4주</span>
+          </div>
+          <div class="revision-item">작업 완료 후 최종 파일은 <strong>1개월간 보관</strong>합니다. 보관 기간이 지난 파일은 삭제되며 복구가 불가능합니다.</div>
+          <div class="revision-item">완성본을 받으신 후에는 반드시 <strong>개인 저장공간에 백업</strong>해주세요.</div>
+          <div class="notice gold"><strong>파일 삭제 이후</strong> 추가 수정이 필요한 경우, 유니티패키지 파일이 있을 때만 추가 작업이 가능합니다. VRM 파일만 있는 경우 수정 작업이 제한되거나 불가능할 수 있습니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. 환불 안내 -->
+    <div class="acc">
+      <button class="acc-trigger" onclick="toggle(this)">
+        <div class="acc-icon">🤎</div>
+        <div class="acc-label">
+          <span class="acc-label-ko">환불 안내</span>
+          <span class="acc-label-en">Refund Policy</span>
+        </div>
+        <svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="acc-body">
+        <div class="acc-inner">
+          <div class="refund-row">
+            <div class="refund-stage">작업 시작 전</div>
+            <div class="refund-pct">100%</div>
+          </div>
+          <div class="refund-row">
+            <div class="refund-stage">작업 시작 후 ~ 성형 컨펌 전</div>
+            <div class="refund-pct">80%</div>
+          </div>
+          <div class="refund-row">
+            <div class="refund-stage">성형 컨펌 후 ~ 페이셜 및 기능 작업 전</div>
+            <div class="refund-pct">50%</div>
+          </div>
+          <div class="refund-row">
+            <div class="refund-stage">단순 변심</div>
+            <div class="refund-pct" style="color:var(--ink-muted);font-size:14px">불가</div>
+          </div>
+          <div class="notice" style="margin-top:14px">
+            작업을 위해 이미 구매한 <strong>Booth 에셋 및 외부 에셋 비용은 어떠한 경우에도 환불 불가</strong>합니다.<br><br>
+            작업자 사유로 안내된 작업 기간을 초과한 경우, <strong>100% 환불과 함께 작업물을 전달</strong>드립니다.<br>
+            단, 신청자 측의 연락 지연 · 컨펌 지연 · 자료 누락 · 요청 변경 등으로 일정이 밀린 경우에는 해당하지 않습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. 포트폴리오 사용 안내 -->
+    <div class="acc">
+      <button class="acc-trigger" onclick="toggle(this)">
+        <div class="acc-icon">🖤</div>
+        <div class="acc-label">
+          <span class="acc-label-ko">포트폴리오 사용 안내</span>
+          <span class="acc-label-en">Portfolio Usage</span>
+        </div>
+        <svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="acc-body">
+        <div class="acc-inner">
+          <div class="revision-item">완성된 작업물은 스튜디오 연화의 <strong>포트폴리오 · 홍보 이미지 · 샘플 페이지 등에 사용</strong>될 수 있습니다.</div>
+          <div class="revision-item">샘플 공개를 원하지 않으시는 경우, 의뢰 시 <strong>반드시 비공개 요청</strong>을 말씀해주세요.</div>
+          <div class="notice">비공개 요청이 없을 경우, 작업물 공개에 동의하신 것으로 간주합니다.</div>
+          <div class="tag-list">
+            <span class="tag rose">비공개 요청 시 +30,000원</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. 기타 안내 -->
+    <div class="acc">
+      <button class="acc-trigger" onclick="toggle(this)">
+        <div class="acc-icon">🩶</div>
+        <div class="acc-label">
+          <span class="acc-label-ko">기타 안내</span>
+          <span class="acc-label-en">Additional Notes</span>
+        </div>
+        <svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="acc-body">
+        <div class="acc-inner">
+          <div class="revision-item">신청 시 본문에 작성된 모든 필독사항 · 작업 규정 · 금액 안내 · 수정 규정 · 환불 정책을 확인하고 동의하신 것으로 간주합니다.</div>
+          <div class="notice gold">
+            <strong>페이셜 트래킹</strong>을 제대로 사용하려면 <strong>Face ID를 지원하는 iPhone 또는 iPad</strong>가 필요합니다. 페이셜 작업 신청 시 해당 기기 사용을 권장드립니다.
+          </div>
+          <div class="revision-item" style="margin-top:12px">포트폴리오 및 샘플 이미지는 VSeeFace 또는 Warudo 환경에서 확인한 결과물입니다. 사용 프로그램 · 조명 · 카메라 설정 · 보정 여부 · 트래킹 환경에 따라 실제 화면의 느낌이 달라질 수 있습니다.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /sections -->
+</div><!-- /content -->
+
+<!-- FOOTER -->
+<div class="footer-stamp">
+  <span class="studio-name">Studio Yeonhwa</span>
+  <p>한 명 한 명의 아바타를 최대한 섬세하게,<br>보내주신 이미지와 분위기에 맞춰 정성껏 작업합니다.</p>
+</div>
+
+<script>
+  function toggle(btn) {
+    const acc = btn.closest('.acc');
+    const isOpen = acc.hasAttribute('data-open');
+    if (isOpen) {
+      acc.removeAttribute('data-open');
+    } else {
+      acc.setAttribute('data-open', '');
+    }
+  }
+
+  // Gallery
+  const SLOT_COUNT = 8;
+  const gallery = document.getElementById('gallery');
+
+  function buildSlots() {
+    for (let i = 0; i < SLOT_COUNT; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'gallery-slot';
+      slot.innerHTML = `
+        <img style="display:none">
+        <input type="file" accept="image/*" onchange="loadImg(this)">
+        <div class="gallery-slot-icon">＋</div>
+        <div class="gallery-slot-label">샘플 이미지<br>업로드</div>
+        <button class="gallery-remove" onclick="removeImg(this)" type="button">✕</button>
+      `;
+      gallery.appendChild(slot);
+    }
+  }
+
+  function loadImg(input) {
+    const slot = input.closest('.gallery-slot');
+    const img = slot.querySelector('img');
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      img.src = e.target.result;
+      img.style.display = 'block';
+      slot.classList.add('has-img');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeImg(btn) {
+    btn.stopPropagation && btn.stopPropagation();
+    const slot = btn.closest('.gallery-slot');
+    const img = slot.querySelector('img');
+    const input = slot.querySelector('input');
+    img.src = '';
+    img.style.display = 'none';
+    input.value = '';
+    slot.classList.remove('has-img');
+  }
+
+  buildSlots();
+</script>
+</body>
+</html>
